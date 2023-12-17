@@ -8,7 +8,7 @@ import os
 app = FastAPI()
 
 client = weaviate.Client("http://localhost:8080")
-client.timeout_config = (3, 200)
+# client.timeout_config = (3, 200)
 
 
 def add_ingredients(data, batch_size=512, debug_mode=False):
@@ -67,9 +67,9 @@ async def create_schema():
         ]
     }
     client.schema.create(schema)
-    if os.path.exists('output.csv'):
+    if os.path.exists('output_file.csv'):
         df = pd.read_csv('output_file.csv', index_col=0)
-        await add_ingredients(df.head(4500), batch_size=99, debug_mode=True)
+        add_ingredients(df.head(4500), batch_size=99, debug_mode=True)
         return {"message": "Schema created with embeddings"}
     return {"message": "Schema created"}
 
@@ -113,17 +113,18 @@ async def add_ingredient(ingredient: str):
 
 
 @app.get("/search")
-async def search_ingredient(query: str, k: int = 100):
+async def search_ingredient(source_ingredient: str, k: int = 100):
     """
         Search for ingredients in Weaviate based on the provided query.
         Args:
-            query (str): The vector representation of the ingredient.
+            source_ingredient (str): The vector representation of the ingredient.
             k (int): number of ingredients
         Returns:
             dict: The result of the search, including ingredient information and distance.
         """
     try:
-        ingredient_emb = ast.literal_eval(query.strip())
+        #TODO - Create the embedding for the source ingredient
+        ingredient_emb = ast.literal_eval(source_ingredient.strip())
         near_vector = {
             "vector": ingredient_emb
         }
