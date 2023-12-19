@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 import weaviate
 import pandas as pd
+
+import foodBERT
 import helper
 import ast
 import os
@@ -124,6 +126,8 @@ async def search_ingredient(source_ingredient: str, k: int = 100):
         """
     try:
         #TODO - Create the embedding for the source ingredient
+        # ingredient_emb = foodBERT.get_embedding(source_ingredient)
+
         ingredient_emb = ast.literal_eval(source_ingredient.strip())
         near_vector = {
             "vector": ingredient_emb
